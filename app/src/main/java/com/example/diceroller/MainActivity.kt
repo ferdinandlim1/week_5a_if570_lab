@@ -1,43 +1,35 @@
-package com.example.diceroller
-
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.diceroller.R
+import com.example.diceroller.databinding.ActivityMainBinding
+import java.text.NumberFormat
+
 
 class MainActivity : AppCompatActivity() {
+    lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val rollButton: Button = findViewById(R.id.button)
-        rollButton.setOnClickListener {
-            rollDice()
-        }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.calculateButton.setOnClickListener{ calculateTip() }
     }
-
-    private fun rollDice() {
-        val dice = Dice(6)
-        val diceRoll = dice.roll()
-        val diceImage: ImageView = findViewById(R.id.imageView)
-        val drawableResource = when (diceRoll) {
-            1 -> R.drawable.dice_1
-            2 -> R.drawable.dice_2
-            3 -> R.drawable.dice_3
-            4 -> R.drawable.dice_4
-            5 -> R.drawable.dice_5
-            else -> R.drawable.dice_6
+    @SuppressLint("StringFormatInvalid")
+    fun calculateTip() {
+        val stringInTextField = binding.costOfService.text.toString()
+        val cost = stringInTextField.toDouble()
+        val selectedId = binding.tipOptions.checkedRadioButtonId
+        val tipPercentage = when (selectedId) {
+            R.id.option_twenty_percent -> 0.20
+            R.id.option_eighteen_percent -> 0.18
+            else -> 0.15
         }
-        diceImage.setImageResource(drawableResource)
-        diceImage.contentDescription = diceRoll.toString()
-
-
+        var tip = tipPercentage * cost
+        val roundUp = binding.roundUpSwitch.isChecked
+        if (roundUp) {
+            tip = kotlin.math.ceil(tip)
+        }
+        val formattedTip = NumberFormat.getCurrencyInstance().format(tip)
+        binding.tipResult.text = getString(R.string.tip_amount, formattedTip)
     }
 }
-
-class Dice(private val numSides: Int) {
-    fun roll(): Int {
-        return (1..numSides).random()
-    }
-}
-
-
