@@ -40,5 +40,6 @@ class MainActivity : AppCompatActivity() {
         binding.tipResult.text = getString(R.string.tip_amount, formattedTip)
 
     }
+    //
 
 }
